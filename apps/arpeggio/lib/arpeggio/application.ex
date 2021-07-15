@@ -16,12 +16,14 @@ defmodule Arpeggio.Application do
       # Start the Telemetry supervisor
       ArpeggioWeb.Telemetry,
       # Start the PubSub system
-      {Phoenix.PubSub, name: Arpeggio.PubSub},
+      {Phoenix.PubSub, name: :arpeggio},
       # Start the Endpoint (http/https)
       ArpeggioWeb.Endpoint
       # Start a worker by calling: Arpeggio.Worker.start_link(arg)
       # {Arpeggio.Worker, arg}
     ]
+
+    :ets.new(:auth_sessions, [:set, :public, :named_table])
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

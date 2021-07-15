@@ -28,7 +28,7 @@ defmodule Arpeggio.MixProject do
   def application do
     [
       mod: {Arpeggio.Application, []},
-      extra_applications: [:readability, :logger, :runtime_tools]
+      extra_applications: [:snowflake, :readability, :logger, :runtime_tools]
     ]
   end
 
@@ -55,8 +55,11 @@ defmodule Arpeggio.MixProject do
       {:ecto_psql_extras, "~> 0.2"},
       {:readability, "~> 0.9"},
       {:floki, "~> 0.20.0"},
+      {:bcrypt_elixir, "~> 2.3.0"},
       {:harmony_protocol, in_umbrella: true},
       {:hrpc, in_umbrella: true},
+      {:dialyxir, "~> 1.0"},
+      {:snowflake, "~> 1.0.0"},
     ]
   end
 
@@ -71,7 +74,7 @@ defmodule Arpeggio.MixProject do
       setup: ["deps.get", "ecto.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
     ]
   end
 end
