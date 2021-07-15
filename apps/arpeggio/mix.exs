@@ -55,6 +55,7 @@ defmodule Arpeggio.MixProject do
       {:ecto_psql_extras, "~> 0.2"},
       {:readability, "~> 0.9"},
       {:floki, "~> 0.20.0"},
+      {:bcrypt_elixir, "~> 2.3.0"},
       {:harmony_protocol, in_umbrella: true},
       {:hrpc, in_umbrella: true},
     ]
