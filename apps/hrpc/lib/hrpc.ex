@@ -8,7 +8,7 @@ defmodule HRPC.Codegen do
     it |> Enum.filter(fn item ->
       case item do
         {_, _, true, true, _, _} -> true
-        # {_, _, false, true, _, _} -> true
+        {_, _, false, true, _, _} -> true
         _ -> false
       end
     end)
@@ -80,6 +80,7 @@ defmodule HRPC.Socket do
   defp generate_stream_endpoints(it) do
     a = it |> stream_only |> Enum.map(fn item ->
       case item do
+        # bidirectional
         {name, route, true, true, input, output} ->
           quote do
             @impl :cowboy_websocket
@@ -94,6 +95,39 @@ defmodule HRPC.Socket do
                 {:stop, state} ->
                   {:stop, state}
                 _ -> throw "unhandled return"
+              end
+            end
+            @impl :cowboy_websocket
+            def websocket_info(info, %{hrpc_path: unquote(route)} = state) do
+              case unquote(String.to_atom((name |> Macro.underscore) <> "_info"))(info, state) do
+                {:ok, state} -> {:ok, state}
+                {:reply, out, state} ->
+                  reply = unquote(output).encode(out)
+                  {:reply, reply, state}
+                {:stop, state} ->
+                  {:stop, state}
+                _ -> throw "unhandled return"
+              end
+            end
+          end
+        # unidirectional
+        {name, route, false, true, input, output} ->
+          quote do
+            @impl :cowboy_websocket
+            def websocket_handle({:binary, data}, %{hrpc_path: unquote(route)} = state) do
+              case state[:hrpc_done] do
+                nil ->
+                  msg = unquote(input).decode(data)
+                  case unquote(String.to_atom((name |> Macro.underscore) <> "_req"))(msg, state) do
+                    {:ok, state} -> {:ok, %{state | hrpc_done: true}}
+                    {:reply, out, state} ->
+                      reply = unquote(output).encode(out)
+                      {:reply, reply, %{state | hrpc_done: true}}
+                    {:stop, state} ->
+                      {:stop, %{state | hrpc_done: true}}
+                    _ -> throw "unhandled return"
+                  end
+                _ -> {:ok, state}
               end
             end
             @impl :cowboy_websocket
