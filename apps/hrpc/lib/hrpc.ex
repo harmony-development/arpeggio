@@ -38,7 +38,10 @@ defmodule HRPC.Codegen do
 
               try do
                 case unquote(mod).unquote(name |> Macro.underscore |> String.to_atom)(parsed) do
-                  {:ok, data} -> conn |> send_resp(200, data |> unquote(output).encode())
+                  {:ok, data} ->
+                    conn
+                    |> put_resp_content_type("application/hrpc", nil)
+                    |> send_resp(200, data |> unquote(output).encode())
                   {:error, reason} -> conn |> send_resp(400, reason)
                 end
               rescue

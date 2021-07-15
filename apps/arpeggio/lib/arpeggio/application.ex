@@ -23,6 +23,8 @@ defmodule Arpeggio.Application do
       # {Arpeggio.Worker, arg}
     ]
 
+    :ets.new(:auth_sessions, [:set, :public, :named_table])
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Arpeggio.Supervisor]
