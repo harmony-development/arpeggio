@@ -8,8 +8,8 @@ defmodule ArpeggioWeb.Glue do
   import HRPC.Codegen
 
   generate_endpoints Protocol.Mediaproxy.V1.MediaProxyServiceService.endpoints(), ArpeggioWeb.Mediaproxy
-  generate_endpoints Protocol.Auth.V1.AuthServiceService.endpoints(), ArpeggioWeb.Mediaproxy
-  generate_endpoints Protocol.Chat.V1.ChatServiceService.endpoints(), ArpeggioWeb.Mediaproxy
-  generate_endpoints Protocol.Sync.V1.PostboxServiceService.endpoints(), ArpeggioWeb.Mediaproxy
-  generate_endpoints Protocol.Voice.V1.VoiceServiceService.endpoints(), ArpeggioWeb.Mediaproxy
+  generate_endpoints Protocol.Auth.V1.AuthServiceService.endpoints(), ArpeggioWeb.Auth
+  generate_endpoints Protocol.Chat.V1.ChatServiceService.endpoints(), ArpeggioWeb.Chat
+  generate_endpoints Protocol.Sync.V1.PostboxServiceService.endpoints(), ArpeggioWeb.Sync
+  generate_endpoints Protocol.Voice.V1.VoiceServiceService.endpoints(), ArpeggioWeb.Voice
 end

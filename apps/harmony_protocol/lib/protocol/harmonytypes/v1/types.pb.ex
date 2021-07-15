@@ -386,3 +386,18 @@ defmodule Protocol.Harmonytypes.V1.Error do
   field :human_message, 2, type: :string
   field :more_details, 3, type: :bytes
 end
+
+defmodule Protocol.Harmonytypes.V1.Token do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          sig: binary,
+          data: binary
+        }
+
+  defstruct [:sig, :data]
+
+  field :sig, 1, type: :bytes
+  field :data, 2, type: :bytes
+end

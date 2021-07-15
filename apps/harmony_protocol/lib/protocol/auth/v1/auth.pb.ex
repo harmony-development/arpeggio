@@ -214,13 +214,13 @@ defmodule Protocol.Auth.V1.FederateReply do
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          token: String.t(),
+          token: Protocol.Harmonytypes.V1.Token.t() | nil,
           nonce: String.t()
         }
 
   defstruct [:token, :nonce]
 
-  field :token, 1, type: :string
+  field :token, 1, type: Protocol.Harmonytypes.V1.Token
   field :nonce, 2, type: :string
 end
 
@@ -242,12 +242,31 @@ defmodule Protocol.Auth.V1.LoginFederatedRequest do
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          auth_token: String.t(),
+          auth_token: Protocol.Harmonytypes.V1.Token.t() | nil,
           domain: String.t()
         }
 
   defstruct [:auth_token, :domain]
 
-  field :auth_token, 1, type: :string
+  field :auth_token, 1, type: Protocol.Harmonytypes.V1.Token
   field :domain, 2, type: :string
+end
+
+defmodule Protocol.Auth.V1.TokenData do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          user_id: non_neg_integer,
+          target: String.t(),
+          username: String.t(),
+          avatar: String.t()
+        }
+
+  defstruct [:user_id, :target, :username, :avatar]
+
+  field :user_id, 1, type: :uint64
+  field :target, 2, type: :string
+  field :username, 3, type: :string
+  field :avatar, 4, type: :string
 end

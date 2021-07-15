@@ -5,6 +5,23 @@
 defmodule ArpeggioWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :arpeggio
 
+
+  def init(_atom, config) do
+    disp = [
+      _: HRPC.Codegen.generate_socket_config(Protocol.Chat.V1.ChatServiceService.endpoints(), ArpeggioWeb.Chat.Socket) ++
+      HRPC.Codegen.generate_socket_config(Protocol.Auth.V1.AuthServiceService.endpoints(), ArpeggioWeb.Auth.Socket) ++
+      HRPC.Codegen.generate_socket_config(Protocol.Voice.V1.VoiceServiceService.endpoints(), ArpeggioWeb.Voice.Socket) ++
+      [{:_, Phoenix.Endpoint.Cowboy2Handler, {ArpeggioWeb.Endpoint, []}}]
+    ]
+    disps = [
+      http: [dispatch: disp]
+    ]
+
+    merged = Config.Reader.merge(config, disps)
+
+    {:ok, merged}
+  end
+
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
@@ -13,10 +30,6 @@ defmodule ArpeggioWeb.Endpoint do
     key: "_arpeggio_key",
     signing_salt: "CyuIKiBy"
   ]
-
-  socket "/socket", ArpeggioWeb.UserSocket,
-    websocket: true,
-    longpoll: false
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 

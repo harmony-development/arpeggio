@@ -5,7 +5,7 @@
 defmodule Protocol.Sync.V1.PostboxServiceService do
 	def endpoints do
 		[
-			{"Pull", "/protocol.sync.v1.PostboxService/Pull", true, true, Protocol.Sync.V1.Ack, Protocol.Sync.V1.Syn},
+			{"Pull", "/protocol.sync.v1.PostboxService/Pull", false, false, Google.Protobuf.Empty, Protocol.Sync.V1.EventQueue},
 			{"Push", "/protocol.sync.v1.PostboxService/Push", false, false, Protocol.Sync.V1.Event, Google.Protobuf.Empty},
 		]
 	end
