@@ -58,6 +58,7 @@ defmodule Arpeggio.MixProject do
       {:bcrypt_elixir, "~> 2.3.0"},
       {:harmony_protocol, in_umbrella: true},
       {:hrpc, in_umbrella: true},
+      {:dialyxir, "~> 1.0"},
     ]
   end
 
@@ -72,7 +73,8 @@ defmodule Arpeggio.MixProject do
       setup: ["deps.get", "ecto.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
+      server: ["dialyzer --quiet", "phx.server"],
+      test: ["dialyzer --quiet", "ecto.create --quiet", "ecto.migrate --quiet", "test"],
     ]
   end
 end

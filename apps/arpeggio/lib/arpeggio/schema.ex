@@ -26,7 +26,7 @@ defmodule Arpeggio.User do
   import Ecto.Changeset
 
   schema "user" do
-    user_id :username, :string
+    field :user_id, :integer
   end
 
   def changeset(user, params \\ %{}) do
@@ -35,14 +35,5 @@ defmodule Arpeggio.User do
     |> validate_required([:username, :email, :password])
     |> unique_constraint(:username)
     |> unique_constraint(:email)
-  end
-end
-
-defmodule Arpeggio.Sessions do
-  use Ecto.Schema
-  import Ecto.Changeset
-
-  schema "session" do
-    field :user_id,
   end
 end
