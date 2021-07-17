@@ -21,18 +21,37 @@ defmodule Arpeggio.DB do
     end
   end
 
-  @spec login(bitstring, bitstring) :: {:ok, Arpeggio.LocalUser.t} | {:error, any}
+  defp random(len) do
+    for _ <- 1..len, into: "", do: <<Enum.random('0123456789abcdef')>>
+  end
+
+  @spec login(bitstring, bitstring) :: {:ok, Arpeggio.LocalUser.t, Arpeggio.Session.t} | {:error, any, any}
   def login(email, password) do
     case Repo.get_by(Arpeggio.LocalUser, email: email) |> Repo.preload(:user) do
       nil ->
-        {:error, "email not found"}
+        {:error, "email not found", nil}
       user ->
         case Bcrypt.verify_pass(password, user.password) do
           true ->
-            {:ok, user}
+            case Repo.insert(%Arpeggio.Session{ id: random(64), user_id: user.user_id }) do
+              {:ok, session} ->
+                {:ok, user, session}
+              {:error, err} ->
+                {:error, err, nil}
+            end
           false ->
-            {:error, "bad password"}
+            {:error, "bad password", nil}
         end
+    end
+  end
+
+  @spec get_user_by_session(bitstring) :: {:error} | {:ok, Arpeggio.User.t, {:local, Arpeggio.LocalUser.t} | {:remote, Arpeggio.RemoteUser.t}}
+  def get_user_by_session(session_id) do
+    case Repo.get_by(Arpeggio.Session, id: session_id) do
+      nil ->
+        {:error}
+      session ->
+        get_user session.user_id
     end
   end
 

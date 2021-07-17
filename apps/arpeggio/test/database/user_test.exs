@@ -72,14 +72,37 @@ defmodule ArpeggioWeb.Database.UserTest do
 
     assert tok == :ok
 
-    {tok, local} = Arpeggio.DB.login("uhhadd@gmail.com", "asdf")
+    {tok, local, _} = Arpeggio.DB.login("uhhadd@gmail.com", "asdf")
 
     assert tok == :ok
     assert local.password != "asdf"
     assert local.user.id == 1234
 
-    {tok, local} = Arpeggio.DB.login("uhhadd@gmail.com", "wawa")
+    {tok, local, _} = Arpeggio.DB.login("uhhadd@gmail.com", "wawa")
 
     assert tok == :error
+  end
+
+  test "sessions", it do
+    {tok, _val} = Arpeggio.DB.new_local_user(%Arpeggio.LocalUser{
+      email: "uhhadd@gmail.com",
+      username: "upperia",
+      password: "asdf", # in the real world we hash before inserting
+    }, %Arpeggio.User{
+      id: 1234,
+    })
+
+    assert tok == :ok
+
+    {tok, _, session} = Arpeggio.DB.login("uhhadd@gmail.com", "asdf")
+
+    assert tok == :ok
+
+    val = Arpeggio.DB.get_user_by_session(session.id)
+
+    assert match?({:ok, _, {:local, _}}, val)
+    {:ok, _, {:local, user}} = val
+
+    assert user.user_id == 1234
   end
 end
