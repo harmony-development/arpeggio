@@ -73,8 +73,7 @@ defmodule Arpeggio.MixProject do
       setup: ["deps.get", "ecto.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      server: ["dialyzer --quiet", "phx.server"],
-      test: ["dialyzer --quiet", "ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
     ]
   end
 end
