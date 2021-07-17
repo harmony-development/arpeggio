@@ -60,4 +60,26 @@ defmodule ArpeggioWeb.Database.UserTest do
     assert match?({:ok, _, {:local, _}}, Arpeggio.DB.get_user(1))
     assert match?({:ok, _, {:remote, _}}, Arpeggio.DB.get_user(2))
   end
+
+  test "password checking", it do
+    {tok, _val} = Arpeggio.DB.new_local_user(%Arpeggio.LocalUser{
+      email: "uhhadd@gmail.com",
+      username: "upperia",
+      password: "asdf", # in the real world we hash before inserting
+    }, %Arpeggio.User{
+      id: 1234,
+    })
+
+    assert tok == :ok
+
+    {tok, lu, u} = Arpeggio.DB.login("uhhadd@gmail.com", "asdf")
+
+    assert tok == :ok
+    assert lu.password != "asdf"
+    assert u.id == 1234
+
+    {tok, lu, u} = Arpeggio.DB.login("uhhadd@gmail.com", "wawa")
+
+    assert tok == :error
+  end
 end

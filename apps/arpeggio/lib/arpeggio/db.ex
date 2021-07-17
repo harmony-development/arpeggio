@@ -5,15 +5,34 @@
 defmodule Arpeggio.DB do
   alias Arpeggio.Repo
 
+  @doc """
+  The password in the local_user is salted by this function,
+  and should be passed in verbatim from user input.
+  """
   @spec new_local_user(Arpeggio.LocalUser.t(), Arpeggio.User.t()) :: {:ok, any} | {:error, any}
   def new_local_user(local_user, user) do
     try do
       Repo.transaction(fn ->
         Repo.insert!(user |> Arpeggio.User.changeset)
-        Repo.insert!(%{local_user | user_id: user.id} |> Arpeggio.LocalUser.changeset)
+        Repo.insert!(%{local_user | user_id: user.id, password: local_user.password |> Bcrypt.hash_pwd_salt} |> Arpeggio.LocalUser.changeset)
       end)
     rescue
       x -> {:error, x}
+    end
+  end
+
+  @spec login(bitstring, bitstring) :: {:ok, Arpeggio.LocalUser.t, Arpeggio.User.t} | {:error, any, nil}
+  def login(email, password) do
+    case Repo.get_by(Arpeggio.LocalUser, email: email) do
+      nil ->
+        {:error, "email not found", nil}
+      user ->
+        case Bcrypt.verify_pass(password, user.password) do
+          true ->
+            {:ok, user, Repo.get!(Arpeggio.User, user.user_id)}
+          false ->
+            {:error, "bad password", nil}
+        end
     end
   end
 
