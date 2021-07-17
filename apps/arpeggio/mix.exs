@@ -28,7 +28,7 @@ defmodule Arpeggio.MixProject do
   def application do
     [
       mod: {Arpeggio.Application, []},
-      extra_applications: [:readability, :logger, :runtime_tools]
+      extra_applications: [:snowflake, :readability, :logger, :runtime_tools]
     ]
   end
 
@@ -59,6 +59,7 @@ defmodule Arpeggio.MixProject do
       {:harmony_protocol, in_umbrella: true},
       {:hrpc, in_umbrella: true},
       {:dialyxir, "~> 1.0"},
+      {:snowflake, "~> 1.0.0"},
     ]
   end
 

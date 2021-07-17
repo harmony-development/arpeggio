@@ -29,7 +29,7 @@ defmodule HRPC.Codegen do
     it |> Enum.map(fn item ->
       case item do
         {name, _route, false, false, input, output} ->
-          quote do
+          quote location: :keep do
             def unquote(name |> Macro.underscore |> String.to_atom)(conn, params) do
               import Logger
 
@@ -43,6 +43,9 @@ defmodule HRPC.Codegen do
                     |> put_resp_content_type("application/hrpc", nil)
                     |> send_resp(200, data |> unquote(output).encode())
                   {:error, reason} -> conn |> send_resp(400, reason)
+                  it ->
+                    IO.inspect it
+                    raise "unhandled return"
                 end
               rescue
                 e ->
@@ -53,7 +56,7 @@ defmodule HRPC.Codegen do
             end
           end
         _ ->
-          quote do
+          quote location: :keep do
           end
       end
     end)
@@ -66,10 +69,10 @@ defmodule HRPC.Codegen do
     it |> Enum.map(fn item ->
       case item do
         {name, route, false, false, _input, _output} ->
-          quote do
+          quote location: :keep do
             post unquote(route), unquote(controller), unquote(name |> Macro.underscore |> String.to_atom)
           end
-          _ -> quote do
+          _ -> quote location: :keep do
           end
       end
     end)
@@ -85,7 +88,7 @@ defmodule HRPC.Socket do
       case item do
         # bidirectional
         {name, route, true, true, input, output} ->
-          quote do
+          quote location: :keep do
             @impl :cowboy_websocket
             def websocket_handle({:binary, data}, %{hrpc_path: unquote(route)} = state) do
               msg = unquote(input).decode(data)
@@ -115,7 +118,7 @@ defmodule HRPC.Socket do
           end
         # unidirectional
         {name, route, false, true, input, output} ->
-          quote do
+          quote location: :keep do
             @impl :cowboy_websocket
             def websocket_handle({:binary, data}, %{hrpc_path: unquote(route)} = state) do
               case state[:hrpc_done] do
@@ -146,7 +149,7 @@ defmodule HRPC.Socket do
               end
             end
           end
-        _ -> quote do
+        _ -> quote location: :keep do
         end
       end
     end)
@@ -161,7 +164,7 @@ defmodule HRPC.Socket do
     inits = epoints |> stream_only |> Enum.map(fn it ->
       {name, route, _, _, _, _} = it
 
-      quote do
+      quote location: :keep do
         def dispatch_init(unquote(route), req, state) do
           case unquote(module).unquote(String.to_atom((name |> Macro.underscore) <> "_init"))(req, state) do
             {:ok, state} -> {:cowboy_websocket, req, state}
@@ -171,7 +174,7 @@ defmodule HRPC.Socket do
       end
     end)
 
-    pre = [quote do
+    pre = [quote location: :keep do
       @behaviour :cowboy_websocket
 
       def dispatch_init(route, req, state) do
@@ -194,7 +197,7 @@ defmodule HRPC.Socket do
         :ok
       end
     end]
-    post = [quote do
+    post = [quote location: :keep do
       @impl :cowboy_websocket
       def websocket_handle({:binary, data}, state) do
         {:ok, state}

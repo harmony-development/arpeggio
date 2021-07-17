@@ -89,13 +89,30 @@ defmodule ArpeggioWeb.Auth do
       ]
     }}}
   end
+  defp do_session(user_id, token) do
+    alias Protocol.Auth.V1.Session
+    alias Protocol.Auth.V1.AuthStep
+
+    %AuthStep{
+      step: {:session, %Session{
+        user_id: user_id,
+        session_token: token,
+    }}}
+  end
+
+  defp new_id() do
+    case Snowflake.next_id() do
+      {:ok, val} -> val
+      {:error, err} -> raise err
+    end
+  end
 
   def next_step(request) do
     case auth_state(request.auth_id) do
       %State{status: :pre_initial_screen} = s ->
-        ok initial_choice_step()
-
         set_auth_state(request.auth_id, %{s | status: :initial_screen})
+
+        ok initial_choice_step()
 
       %State{status: :initial_screen} = s ->
         case request.step do
@@ -112,10 +129,30 @@ defmodule ArpeggioWeb.Auth do
         end
 
       %State{status: :login} ->
-        error "unimplemented"
+        {:form, form} = request.step
+        [%{field: {:string, email}}, %{field: {:bytes, password}}] = form.fields
+
+        case Arpeggio.DB.login(email, password) do
+          {:ok, _, session} ->
+            ok do_session(session.user_id, session.id)
+          _ ->
+            error "bad credentials"
+        end
 
       %State{status: :register} ->
-        error "unimplemented"
+        {:form, form} = request.step
+        [%{field: {:string, email}}, %{field: {:string, username}}, %{field: {:bytes, password}}] = form.fields
+
+        Arpeggio.DB.new_local_user(%Arpeggio.LocalUser{
+          email: email,
+          username: username,
+          password: password,
+        }, %Arpeggio.User{
+          id: new_id()
+        })
+        {:ok, _, session} = Arpeggio.DB.login(email, password)
+
+        ok do_session(session.user_id, session.id)
 
       nil -> error "invalid auth request"
       _ -> error "unhandled"

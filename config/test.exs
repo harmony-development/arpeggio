@@ -24,3 +24,6 @@ config :arpeggio, ArpeggioWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :debug
+
+config :snowflake,
+  machine_id: 727
