@@ -21,17 +21,17 @@ defmodule Arpeggio.DB do
     end
   end
 
-  @spec login(bitstring, bitstring) :: {:ok, Arpeggio.LocalUser.t, Arpeggio.User.t} | {:error, any, nil}
+  @spec login(bitstring, bitstring) :: {:ok, Arpeggio.LocalUser.t} | {:error, any}
   def login(email, password) do
-    case Repo.get_by(Arpeggio.LocalUser, email: email) do
+    case Repo.get_by(Arpeggio.LocalUser, email: email) |> Repo.preload(:user) do
       nil ->
-        {:error, "email not found", nil}
+        {:error, "email not found"}
       user ->
         case Bcrypt.verify_pass(password, user.password) do
           true ->
-            {:ok, user, Repo.get!(Arpeggio.User, user.user_id)}
+            {:ok, user}
           false ->
-            {:error, "bad password", nil}
+            {:error, "bad password"}
         end
     end
   end

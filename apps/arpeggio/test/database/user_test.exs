@@ -72,13 +72,13 @@ defmodule ArpeggioWeb.Database.UserTest do
 
     assert tok == :ok
 
-    {tok, lu, u} = Arpeggio.DB.login("uhhadd@gmail.com", "asdf")
+    {tok, local} = Arpeggio.DB.login("uhhadd@gmail.com", "asdf")
 
     assert tok == :ok
-    assert lu.password != "asdf"
-    assert u.id == 1234
+    assert local.password != "asdf"
+    assert local.user.id == 1234
 
-    {tok, lu, u} = Arpeggio.DB.login("uhhadd@gmail.com", "wawa")
+    {tok, local} = Arpeggio.DB.login("uhhadd@gmail.com", "wawa")
 
     assert tok == :error
   end
