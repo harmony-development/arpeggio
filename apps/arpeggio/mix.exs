@@ -56,10 +56,11 @@ defmodule Arpeggio.MixProject do
       {:readability, "~> 0.9"},
       {:floki, "~> 0.20.0"},
       {:bcrypt_elixir, "~> 2.3.0"},
+      {:httpoison, "~> 1.7", override: true},
       {:harmony_protocol, in_umbrella: true},
       {:hrpc, in_umbrella: true},
       {:dialyxir, "~> 1.0"},
-      {:snowflake, "~> 1.0.0"},
+      {:snowflake, "~> 1.0.0"}
     ]
   end
 
@@ -74,7 +75,7 @@ defmodule Arpeggio.MixProject do
       setup: ["deps.get", "ecto.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
     ]
   end
 end
