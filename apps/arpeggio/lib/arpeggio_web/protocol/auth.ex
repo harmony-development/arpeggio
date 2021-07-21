@@ -112,58 +112,71 @@ defmodule ArpeggioWeb.Auth do
     end
   end
 
-  def next_step(request) do
-    aid = request.auth_id
+  #
+  # send the initial screen
+  #
+  defp handle_next_step(request, %State{status: :pre_initial_screen} = s, _) do
+    set_auth_state(request.auth_id, %{s | status: :initial_screen})
 
-    case auth_state(request.auth_id) do
-      %State{status: :pre_initial_screen} = s ->
-        set_auth_state(request.auth_id, %{s | status: :initial_screen})
-
-        ok_send initial_choice_step(), aid
-
-      %State{status: :initial_screen} = s ->
-        case request.step do
-          {:choice, %{choice: it}} ->
-            case it do
-              "login" ->
-                set_auth_state(request.auth_id, %{s | status: :login})
-                ok_send login_step(), aid
-              "register" ->
-                set_auth_state(request.auth_id, %{s | status: :register})
-                ok_send register_step(), aid
-            end
-          _ -> error "bad choice"
-        end
-
-      %State{status: :login} ->
-        {:form, form} = request.step
-        [%{field: {:string, email}}, %{field: {:bytes, password}}] = form.fields
-
-        case Arpeggio.DB.login(email, password) do
-          {:ok, _, session} ->
-            ok_send do_session(session.user_id, session.id), aid
-          _ ->
-            error "bad credentials"
-        end
-
-      %State{status: :register} ->
-        {:form, form} = request.step
-        [%{field: {:string, email}}, %{field: {:string, username}}, %{field: {:bytes, password}}] = form.fields
-
-        Arpeggio.DB.new_local_user(%Arpeggio.LocalUser{
-          email: email,
-          username: username,
-          password: password,
-        }, %Arpeggio.User{
-          id: new_id()
-        })
-        {:ok, _, session} = Arpeggio.DB.login(email, password)
-
-        ok_send do_session(session.user_id, session.id), aid
-
-      nil -> error "invalid auth request"
-      _ -> error "unhandled"
+    ok_send initial_choice_step(), request.auth_id
+  end
+  #
+  # handle the initial screen button click
+  #
+  defp handle_next_step(request, %State{status: :initial_screen} = s, {:choice, %{choice: it}}) do
+    case it do
+      "login" ->
+        set_auth_state(request.auth_id, %{s | status: :login})
+        ok_send login_step(), request.auth_id
+      "register" ->
+        set_auth_state(request.auth_id, %{s | status: :register})
+        ok_send register_step(), request.auth_id
+      _ ->
+        error "bad choice"
     end
+  end
+  #
+  # handle the login form submission
+  #
+  defp handle_next_step(
+    request,
+    %State{status: :login},
+    {:form, %{fields: [%{field: {:string, email}}, %{field: {:bytes, password}}]}}
+  ) do
+    case Arpeggio.DB.login(email, password) do
+      {:ok, _, session} ->
+        ok_send do_session(session.user_id, session.id), request.auth_id
+      _ ->
+        error "bad credentials"
+    end
+  end
+  #
+  # handle the register form submission
+  #
+  defp handle_next_step(
+    request,
+    %State{status: :register},
+    {:form, %{fields: [%{field: {:string, email}}, %{field: {:string, username}}, %{field: {:bytes, password}}]}}
+  ) do
+    Arpeggio.DB.new_local_user(%Arpeggio.LocalUser{
+      email: email,
+      username: username,
+      password: password,
+    }, %Arpeggio.User{
+      id: new_id()
+    })
+    {:ok, _, session} = Arpeggio.DB.login(email, password)
+
+    ok_send do_session(session.user_id, session.id), request.auth_id
+  end
+  defp handle_next_step(
+    _, _, _
+  ) do
+    error "bad next step"
+  end
+
+  def next_step(request) do
+    handle_next_step(request, auth_state(request.auth_id), request.step)
   end
 
   def stream_steps_init(_req, state) do
