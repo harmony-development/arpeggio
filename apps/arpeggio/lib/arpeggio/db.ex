@@ -87,4 +87,13 @@ defmodule Arpeggio.DB do
         end
     end
   end
+
+  @spec new_guild(Arpeggio.Guild.t()) :: {:ok, any} | {:error, any}
+  def new_guild(guild) do
+    try do
+      Repo.transaction(Repo.insert!(guild |> Arpeggio.Guild.changeset))
+    rescue
+      x -> {:error, x}
+    end
+  end
 end
