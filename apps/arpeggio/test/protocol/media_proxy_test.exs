@@ -8,63 +8,48 @@ defmodule ArpeggioWeb.MediaproxyTest do
   test "can instant view", %{conn: conn} do
     import Protocol.Mediaproxy.V1.InstantViewRequest
 
-    body = new(url: "https://en.wikipedia.org/wiki/Ben_Shapiro") |> encode()
+    body = new(url: "https://en.wikipedia.org/wiki/Ben_Shapiro")
 
-    conn =
-      conn
-      |> put_req_header("content-type", "application/hrpc")
-      |> post("/protocol.mediaproxy.v1.MediaProxyService/CanInstantView", body)
+    res = ArpeggioWeb.Mediaproxy.can_instant_view(body)
 
-    assert conn.status == 200
+    assert match?({:ok, _}, res)
+    {:ok, response} = res
 
-    resp = Protocol.Mediaproxy.V1.CanInstantViewResponse.decode(conn.resp_body)
-    assert resp.can_instant_view
+    assert response.can_instant_view
   end
 
   test "can't instant view", %{conn: conn} do
     import Protocol.Mediaproxy.V1.InstantViewRequest
 
-    body = new(url: "https://google.com") |> encode()
+    body = new(url: "https://google.com")
 
-    conn =
-      conn
-      |> put_req_header("content-type", "application/hrpc")
-      |> post("/protocol.mediaproxy.v1.MediaProxyService/CanInstantView", body)
+    res = ArpeggioWeb.Mediaproxy.can_instant_view(body)
 
-    assert conn.status == 200
+    assert match?({:ok, _}, res)
+    {:ok, response} = res
 
-    resp = Protocol.Mediaproxy.V1.CanInstantViewResponse.decode(conn.resp_body)
-    assert !resp.can_instant_view
+    assert !response.can_instant_view
   end
 
   test "instant view", %{conn: conn} do
     import Protocol.Mediaproxy.V1.InstantViewRequest
 
-    body = new(url: "https://en.wikipedia.org/wiki/Ben_Shapiro") |> encode()
+    body = new(url: "https://en.wikipedia.org/wiki/Ben_Shapiro")
 
-    conn =
-      conn
-      |> put_req_header("content-type", "application/hrpc")
-      |> post("/protocol.mediaproxy.v1.MediaProxyService/InstantView", body)
+    res = ArpeggioWeb.Mediaproxy.instant_view(body)
+    assert match?({:ok, _}, res)
+    {:ok, response} = res
 
-    assert conn.status == 200
-
-    resp = Protocol.Mediaproxy.V1.InstantViewResponse.decode(conn.resp_body)
-    assert resp.content =~ "Ben"
+    assert response.content =~ "Ben"
   end
 
   test "link preview", %{conn: conn} do
     import Protocol.Mediaproxy.V1.FetchLinkMetadataRequest
 
-    body = new(url: "https://en.wikipedia.org/wiki/Ben_Shapiro") |> encode()
+    body = new(url: "https://en.wikipedia.org/wiki/Ben_Shapiro")
 
-    conn =
-      conn
-      |> put_req_header("content-type", "application/hrpc")
-      |> post("/protocol.mediaproxy.v1.MediaProxyService/FetchLinkMetadata", body)
-
-    assert conn.status == 200
-
-    Protocol.Mediaproxy.V1.FetchLinkMetadataResponse.decode(conn.resp_body)
+    res = ArpeggioWeb.Mediaproxy.fetch_link_metadata(body)
+    assert match?({:ok, _}, res)
+    {:ok, response} = res
   end
 end
