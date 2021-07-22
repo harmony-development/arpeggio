@@ -91,9 +91,18 @@ defmodule Arpeggio.DB do
   @spec new_guild(Arpeggio.Guild.t()) :: {:ok, any} | {:error, any}
   def new_guild(guild) do
     try do
-      Repo.transaction(Repo.insert!(guild |> Arpeggio.Guild.changeset))
+      Repo.transaction(fn -> Repo.insert!(guild |> Arpeggio.Guild.changeset) end)
     rescue
       x -> {:error, x}
+    end
+  end
+
+  @spec get_guild_by_id(integer) :: {:ok, Arpeggio.Guild.t} | {:error}
+  def get_guild_by_id(guild_id) do
+    guild = Repo.get(Arpeggio.Guild, guild_id)
+    case guild do
+      nil ->  {:error}
+      guild -> {:ok, guild}
     end
   end
 end

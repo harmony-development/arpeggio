@@ -2,23 +2,35 @@ defmodule ArpeggioWeb.Database.GuildTest do
   use ArpeggioWeb.ConnCase
 
   test "new guild" do
-    {res, _val} = Arpeggio.DB.new_guild(%Arpeggio.Guild{
-      id: 1,
-      name: "test",
-    })
-    assert res == :ok
+    res =
+      Arpeggio.DB.new_guild(%Arpeggio.Guild{
+        id: 1,
+        name: "test"
+      })
 
-    {res, _val} = Arpeggio.DB.new_guild(%Arpeggio.Guild{
-      id: 1,
-      name: "test",
-    })
-    assert res == :error
+    assert match?({:ok, _}, res)
+
+    res =
+      Arpeggio.DB.new_guild(%Arpeggio.Guild{
+        id: 1,
+        name: "test"
+      })
+
+    assert match?({:error, _}, res)
   end
 
   test "default values are set" do
-    res = Arpeggio.DB.new_guild(%Arpeggio.Guild{})
+    res =
+      Arpeggio.DB.new_guild(%Arpeggio.Guild{
+        id: 1
+      })
+
     assert match?({:ok, _}, res)
-    {:ok, val} = res
-    IO.inspect val
+    {:ok, _} = res
+
+    res = Arpeggio.DB.get_guild_by_id(1)
+    assert match?({:ok, _}, res)
+    {:ok, guild} = res
+    guild.name =~ "New Guild"
   end
 end
