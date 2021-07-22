@@ -106,4 +106,12 @@ defmodule Arpeggio.DB do
       guild -> {:ok, guild}
     end
   end
+
+  def check_session(conn) do
+    session = Repo.get(Arpeggio.Session, conn |> Plug.Conn.get_req_header("authorization") |> Enum.at(0))
+    case session do
+      nil -> throw "bad session"
+      _ -> nil
+    end
+  end
 end

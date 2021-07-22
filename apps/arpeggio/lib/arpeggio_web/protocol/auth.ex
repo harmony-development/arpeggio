@@ -36,6 +36,12 @@ defmodule ArpeggioWeb.Auth do
 
   # begin impls
 
+  def check_logged_in(conn, _request) do
+    Arpeggio.DB.check_session conn
+
+    {:ok, %Google.Protobuf.Empty{}}
+  end
+
   def begin_auth(_conn, _request) do
     id = random(32)
 
