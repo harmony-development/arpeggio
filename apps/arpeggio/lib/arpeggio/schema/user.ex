@@ -9,6 +9,7 @@ defmodule Arpeggio.User do
   schema "users" do
     has_one :local_user, Arpeggio.LocalUser
     has_one :remote_user, Arpeggio.RemoteUser
+    has_many :guild_list_entry, Arpeggio.GuildListEntry
 
     field :user_name, :string
     field :user_avatar, :string

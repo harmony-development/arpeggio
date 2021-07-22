@@ -11,8 +11,8 @@ defmodule Arpeggio.Guild do
     field :avatar, :string
   end
 
-  def changeset(user, params \\ %{}) do
-    user
+  def changeset(guild, params \\ %{}) do
+    guild
     |> cast(params, [:name, :avatar])
     |> unique_constraint(:id)
   end

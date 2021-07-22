@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Danil Korennykh <bluskript@gmail.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 defmodule ArpeggioWeb.Database.GuildTest do
   use ArpeggioWeb.ConnCase
 
@@ -22,7 +26,7 @@ defmodule ArpeggioWeb.Database.GuildTest do
   test "default values are set" do
     res =
       Arpeggio.DB.new_guild(%Arpeggio.Guild{
-        id: 1
+        id: 1,
       })
 
     assert match?({:ok, _}, res)

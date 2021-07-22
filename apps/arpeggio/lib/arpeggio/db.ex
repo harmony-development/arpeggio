@@ -105,4 +105,13 @@ defmodule Arpeggio.DB do
       guild -> {:ok, guild}
     end
   end
+
+  @spec add_guild_to_list(Arpeggio.GuildListEntry.t()) :: {:ok, any} | {:error, any}
+  def add_guild_to_list(guild_list_entry) do
+    try do
+      Repo.insert!(guild_list_entry |> Arpeggio.GuildListEntry.changeset)
+    rescue
+      x -> {:error, x}
+    end
+  end
 end
