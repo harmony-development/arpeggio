@@ -185,6 +185,35 @@ defmodule ArpeggioWeb.Auth do
     handle_next_step(request, auth_state(request.auth_id), request.step)
   end
 
+  def key(_conn, _request) do
+    {:ok, %Protocol.Auth.V1.KeyReply{ key: Arpeggio.key |> Ed25519.public_key }}
+  end
+
+  def federate(conn, request) do
+    session = Arpeggio.DB.get_session conn
+
+    {:ok, user, {_, _}} = Arpeggio.DB.get_user(session.user_id)
+
+    target = request.target
+
+    dat = %Protocol.Auth.V1.TokenData {
+      user_id: session.user_id,
+      target: target,
+      username: user.user_name,
+      avatar: user.user_avatar
+    }
+
+    raw = dat |> Protocol.Auth.V1.TokenData.encode
+
+    {:ok,
+      %Protocol.Auth.V1.FederateReply{
+        token: %Protocol.Harmonytypes.V1.Token{
+          sig: raw |> Ed25519.sign(Arpeggio.key),
+          data: dat
+        }
+      }}
+  end
+
   def stream_steps_init(_req, state) do
     {:ok, state}
   end

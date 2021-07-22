@@ -1,0 +1,15 @@
+[package]
+name = "ed25519"
+version = "0.1.0"
+authors = []
+edition = "2018"
+
+[lib]
+name = "ed25519"
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+rustler = "0.22.0"
+ed25519-compact = "0.1"
+pem = "0.8"

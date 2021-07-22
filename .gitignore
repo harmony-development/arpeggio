@@ -22,3 +22,10 @@ erl_crash.dump
 
 # Temporary files for e.g. tests
 /tmp
+
+# default private key
+arpeggio-key.pem
+
+priv/native
+native/ed25519/.cargo
+native/ed25519/target

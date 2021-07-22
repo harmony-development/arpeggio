@@ -1,0 +1,3 @@
+/priv/native
+/native/ed25519/.cargo
+/native/ed25519/target

@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 defmodule Arpeggio do
+  def key do
+    Application.get_env(:arpeggio, :_private_key)
+  end
   @moduledoc """
   Arpeggio keeps the contexts that define your domain
   and business logic.

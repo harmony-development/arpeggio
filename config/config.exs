@@ -14,6 +14,9 @@ use Mix.Config
 config :arpeggio,
   ecto_repos: [Arpeggio.Repo]
 
+config :arpeggio,
+  federation_private_key: "arpeggio-key.pem"
+
 # Configures the endpoint
 config :arpeggio, ArpeggioWeb.Endpoint,
   url: [host: "localhost"],

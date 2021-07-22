@@ -59,6 +59,7 @@ defmodule Arpeggio.MixProject do
       {:httpoison, "~> 1.7", override: true},
       {:harmony_protocol, in_umbrella: true},
       {:hrpc, in_umbrella: true},
+      {:ed25519_crypt, in_umbrella: true},
       {:dialyxir, "~> 1.0"},
       {:snowflake, "~> 1.0.0"}
     ]
