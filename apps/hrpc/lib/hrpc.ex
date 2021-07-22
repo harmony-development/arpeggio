@@ -37,7 +37,7 @@ defmodule HRPC.Codegen do
               parsed = unquote(input).decode(body)
 
               try do
-                case unquote(mod).unquote(name |> Macro.underscore |> String.to_atom)(parsed) do
+                case unquote(mod).unquote(name |> Macro.underscore |> String.to_atom)(conn, parsed) do
                   {:ok, data} ->
                     conn
                     |> put_resp_content_type("application/hrpc", nil)

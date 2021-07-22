@@ -15,7 +15,7 @@ defmodule ArpeggioWeb.Chat do
     {:ok, state}
   end
 
-  def get_user(req) do
+  def get_user(_conn, req) do
     {:ok, user, {_, _}} = Arpeggio.DB.get_user(req.user_id)
 
     {:ok, %Protocol.Chat.V1.GetUserResponse{

@@ -10,7 +10,7 @@ defmodule ArpeggioWeb.MediaproxyTest do
 
     body = new(url: "https://en.wikipedia.org/wiki/Ben_Shapiro")
 
-    res = ArpeggioWeb.Mediaproxy.can_instant_view(body)
+    res = ArpeggioWeb.Mediaproxy.can_instant_view(conn, body)
 
     assert match?({:ok, _}, res)
     {:ok, response} = res
@@ -23,7 +23,7 @@ defmodule ArpeggioWeb.MediaproxyTest do
 
     body = new(url: "https://google.com")
 
-    res = ArpeggioWeb.Mediaproxy.can_instant_view(body)
+    res = ArpeggioWeb.Mediaproxy.can_instant_view(conn, body)
 
     assert match?({:ok, _}, res)
     {:ok, response} = res
@@ -36,7 +36,7 @@ defmodule ArpeggioWeb.MediaproxyTest do
 
     body = new(url: "https://en.wikipedia.org/wiki/Ben_Shapiro")
 
-    res = ArpeggioWeb.Mediaproxy.instant_view(body)
+    res = ArpeggioWeb.Mediaproxy.instant_view(conn, body)
     assert match?({:ok, _}, res)
     {:ok, response} = res
 
@@ -48,7 +48,7 @@ defmodule ArpeggioWeb.MediaproxyTest do
 
     body = new(url: "https://en.wikipedia.org/wiki/Ben_Shapiro")
 
-    res = ArpeggioWeb.Mediaproxy.fetch_link_metadata(body)
+    res = ArpeggioWeb.Mediaproxy.fetch_link_metadata(conn, body)
     assert match?({:ok, _}, res)
     {:ok, response} = res
   end

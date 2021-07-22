@@ -17,8 +17,8 @@ defmodule ArpeggioWeb.Mediaproxy do
     end
   end
 
-  @spec instant_view(Protocol.Mediaproxy.V1.InstantViewRequest.t()) :: { :ok, Protocol.Mediaproxy.V1.InstantViewResponse.t() } | { :error, term() }
-  def instant_view(request) do
+  @spec instant_view(any, Protocol.Mediaproxy.V1.InstantViewRequest.t()) :: { :ok, Protocol.Mediaproxy.V1.InstantViewResponse.t() } | { :error, term() }
+  def instant_view(_conn, request) do
     import Protocol.Mediaproxy.V1.InstantViewResponse
 
     case url_data(request.url) do
@@ -29,13 +29,13 @@ defmodule ArpeggioWeb.Mediaproxy do
     end
   end
 
-  @spec fetch_link_metadata(Protocol.Mediaproxy.V1.FetchLinkMetadataRequest.t()) :: { :ok, Protocol.Mediaproxy.V1.FetchLinkMetadataResponse.t() } | { :error, term() }
-  def fetch_link_metadata(request) do
+  @spec fetch_link_metadata(any, Protocol.Mediaproxy.V1.FetchLinkMetadataRequest.t()) :: { :ok, Protocol.Mediaproxy.V1.FetchLinkMetadataResponse.t() } | { :error, term() }
+  def fetch_link_metadata(_conn, _request) do
     { :error, "not implemented" }
   end
 
-  @spec can_instant_view(Protocol.Mediaproxy.V1.InstantViewRequest.t()) :: { :ok, Protocol.Mediaproxy.V1.CanInstantViewResponse.t() } | { :error, term() }
-  def can_instant_view(request) do
+  @spec can_instant_view(any, Protocol.Mediaproxy.V1.InstantViewRequest.t()) :: { :ok, Protocol.Mediaproxy.V1.CanInstantViewResponse.t() } | { :error, term() }
+  def can_instant_view(_conn, request) do
     import Protocol.Mediaproxy.V1.CanInstantViewResponse
 
     case url_data(request.url) do

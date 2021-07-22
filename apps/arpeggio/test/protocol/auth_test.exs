@@ -5,30 +5,30 @@
 defmodule ArpeggioWeb.AuthTest do
   use ArpeggioWeb.ConnCase
 
-  defp make_account() do
+  defp make_account(conn) do
     alias ArpeggioWeb.Auth
     alias Protocol.Auth.V1, as: AuthP
     alias Google.Protobuf.Empty
 
-    it = Auth.begin_auth(%Empty{})
+    it = Auth.begin_auth(conn, %Empty{})
     assert match? {:ok, _}, it
     {:ok, resp} = it
 
     assert match? {:ok, _}, Auth.stream_steps_req(%AuthP.StreamStepsRequest{ auth_id: resp.auth_id }, %{})
-    assert match? {:ok, _}, Auth.next_step(%AuthP.NextStepRequest{ auth_id: resp.auth_id })
+    assert match? {:ok, _}, Auth.next_step(conn, %AuthP.NextStepRequest{ auth_id: resp.auth_id })
     assert_receive %AuthP.AuthStep{step: {:choice, _}}
 
-    assert match? {:ok, _}, Auth.next_step(%AuthP.NextStepRequest{
+    assert match? {:ok, _}, Auth.next_step(conn, %AuthP.NextStepRequest{
       auth_id: resp.auth_id,
       step: {:choice, %{choice: "register"}}
     })
-    assert match? {:error, _}, Auth.next_step(%AuthP.NextStepRequest{
+    assert match? {:error, _}, Auth.next_step(conn, %AuthP.NextStepRequest{
       auth_id: resp.auth_id,
       step: {:choice, %{choice: "register"}}
     })
 
     assert_receive %AuthP.AuthStep{step: {:form, _}}
-    assert match? {:ok, _}, Auth.next_step(%AuthP.NextStepRequest{
+    assert match? {:ok, _}, Auth.next_step(conn, %AuthP.NextStepRequest{
       auth_id: resp.auth_id,
       step: {:form, %{fields: [%{field: {:string, "keke"}}, %{field: {:string, "keke"}}, %{field: {:bytes, "keke"}}]}}
     })
@@ -37,35 +37,35 @@ defmodule ArpeggioWeb.AuthTest do
   end
 
   test "register", %{conn: conn} do
-    make_account()
+    make_account(conn)
   end
 
   test "login", %{conn: conn} do
-    make_account()
+    make_account(conn)
 
     alias ArpeggioWeb.Auth
     alias Protocol.Auth.V1, as: AuthP
     alias Google.Protobuf.Empty
 
-    it = Auth.begin_auth(%Empty{})
+    it = Auth.begin_auth(conn, %Empty{})
     assert match? {:ok, _}, it
     {:ok, resp} = it
 
     assert match? {:ok, _}, Auth.stream_steps_req(%AuthP.StreamStepsRequest{ auth_id: resp.auth_id }, %{})
-    assert match? {:ok, _}, Auth.next_step(%AuthP.NextStepRequest{ auth_id: resp.auth_id })
+    assert match? {:ok, _}, Auth.next_step(conn, %AuthP.NextStepRequest{ auth_id: resp.auth_id })
     assert_receive %AuthP.AuthStep{step: {:choice, _}}
 
-    assert match? {:ok, _}, Auth.next_step(%AuthP.NextStepRequest{
+    assert match? {:ok, _}, Auth.next_step(conn, %AuthP.NextStepRequest{
       auth_id: resp.auth_id,
       step: {:choice, %{choice: "login"}}
     })
-    assert match? {:error, _}, Auth.next_step(%AuthP.NextStepRequest{
+    assert match? {:error, _}, Auth.next_step(conn, %AuthP.NextStepRequest{
       auth_id: resp.auth_id,
       step: {:choice, %{choice: "login"}}
     })
 
     assert_receive %AuthP.AuthStep{step: {:form, _}}
-    assert match? {:ok, _}, Auth.next_step(%AuthP.NextStepRequest{
+    assert match? {:ok, _}, Auth.next_step(conn, %AuthP.NextStepRequest{
       auth_id: resp.auth_id,
       step: {:form, %{fields: [%{field: {:string, "keke"}}, %{field: {:bytes, "keke"}}]}}
     })

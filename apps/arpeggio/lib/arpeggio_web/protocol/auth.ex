@@ -36,7 +36,7 @@ defmodule ArpeggioWeb.Auth do
 
   # begin impls
 
-  def begin_auth(_request) do
+  def begin_auth(_conn, _request) do
     id = random(32)
 
     set_auth_state(id, %State{})
@@ -175,7 +175,7 @@ defmodule ArpeggioWeb.Auth do
     error "bad next step"
   end
 
-  def next_step(request) do
+  def next_step(_conn, request) do
     handle_next_step(request, auth_state(request.auth_id), request.step)
   end
 
