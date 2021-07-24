@@ -214,14 +214,12 @@ defmodule Protocol.Auth.V1.FederateReply do
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          token: Protocol.Harmonytypes.V1.Token.t() | nil,
-          nonce: String.t()
+          token: Protocol.Harmonytypes.V1.Token.t() | nil
         }
 
-  defstruct [:token, :nonce]
+  defstruct [:token]
 
   field :token, 1, type: Protocol.Harmonytypes.V1.Token
-  field :nonce, 2, type: :string
 end
 
 defmodule Protocol.Auth.V1.KeyReply do
