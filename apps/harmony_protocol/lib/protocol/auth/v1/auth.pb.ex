@@ -229,12 +229,12 @@ defmodule Protocol.Auth.V1.KeyReply do
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          key: String.t()
+          key: binary
         }
 
   defstruct [:key]
 
-  field :key, 1, type: :string
+  field :key, 1, type: :bytes
 end
 
 defmodule Protocol.Auth.V1.LoginFederatedRequest do
