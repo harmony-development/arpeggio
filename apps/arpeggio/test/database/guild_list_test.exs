@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-defmodule ArpeggioWeb.Database.GuildTest do
+defmodule ArpeggioWeb.Database.GuildListTest do
   use ArpeggioWeb.ConnCase
 
   test "entry addition" do
