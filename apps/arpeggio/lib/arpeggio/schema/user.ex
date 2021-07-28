@@ -10,6 +10,8 @@ defmodule Arpeggio.User do
     has_one :local_user, Arpeggio.LocalUser
     has_one :remote_user, Arpeggio.RemoteUser
 
+    has_many :guilds, Arpeggio.Guild
+
     field :user_name, :string
     field :user_avatar, :string
     field :user_status, UserStatus
