@@ -61,7 +61,8 @@ defmodule Arpeggio.MixProject do
       {:hrpc, in_umbrella: true},
       {:ed25519_crypt, in_umbrella: true},
       {:dialyxir, "~> 1.0"},
-      {:snowflake, "~> 1.0.0"}
+      {:snowflake, "~> 1.0.0"},
+      {:ecto_ranked, "~> 0.4.0"},
     ]
   end
 

@@ -12,6 +12,8 @@ defmodule Arpeggio.User do
 
     has_many :guilds, Arpeggio.Guild
 
+    has_many :guild_list_entries, Arpeggio.GuildListEntry
+
     field :user_name, :string
     field :user_avatar, :string
     field :user_status, UserStatus
