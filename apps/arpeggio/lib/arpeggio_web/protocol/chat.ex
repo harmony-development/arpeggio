@@ -25,4 +25,32 @@ defmodule ArpeggioWeb.Chat do
       is_bot: user.is_bot,
     }}
   end
+
+  # TODO: handle federated vs local users
+  def create_guild(conn, req) do
+    user = Arpeggio.DB.get_user_from conn, load_local_remote: true
+
+    g = case Arpeggio.DB.new_guild %Arpeggio.Guild {
+      name: req.guild_name,
+      avatar: req.picture_url,
+      metadata: req.metadata
+    } do
+      {:ok, g} -> g
+      {:error, _} -> throw "failed to make guild"
+    end
+
+    if user.remote_user != nil do
+      # TODO(SYNC): broadcast using sync service
+    else
+      Arpeggio.DB.GuildListEntries.new user.id, g.id, ""
+      Phoenix.PubSub.broadcast :arpeggio, "homeserver-events:#{user.id}", %Protocol.Chat.V1.Event {
+        event: {:guild_added_to_list, %Protocol.Chat.V1.Event.GuildAddedToList{
+          guild_id: g.id,
+          homeserver: ""
+        }}
+      }
+    end
+
+    {:ok, %Protocol.Chat.V1.CreateGuildResponse{ guild_id: g.id }}
+  end
 end

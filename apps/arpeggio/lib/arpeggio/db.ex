@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 defmodule Arpeggio.DB do
+  import Ecto.Query
   alias Arpeggio.Repo
 
   @doc """
@@ -124,6 +125,26 @@ defmodule Arpeggio.DB do
     case session do
       nil -> throw "bad session"
       _ -> session
+    end
+  end
+
+  def get_user_from(%Plug.Conn{} = conn, opts \\ %{load_local_remote: false}) do
+    auth = conn |> Plug.Conn.get_req_header("authorization")
+
+    q = case opts[:load_local_remote] do
+      false -> from session in Arpeggio.Session, where: session.id == ^auth, preload: [:user]
+
+      true -> from session in Arpeggio.Session,
+        where: session.id == ^auth,
+        left_join: user in assoc(session, :user),
+        left_join: local_user in assoc(user, :local_user),
+        left_join: remote_user in assoc(user, :remote_user),
+        preload: [user: {user, local_user: local_user, remote_user: remote_user}]
+    end
+
+    case Repo.one q do
+      nil -> throw "bad session"
+      it -> it.user
     end
   end
 end
