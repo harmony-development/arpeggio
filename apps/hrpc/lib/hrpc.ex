@@ -167,7 +167,7 @@ defmodule HRPC.Socket do
       quote location: :keep do
         def dispatch_init(unquote(route), req, state) do
           case unquote(module).unquote(String.to_atom((name |> Macro.underscore) <> "_init"))(req, state) do
-            {:ok, state} -> {:cowboy_websocket, req, state}
+            {:ok, state} -> {:cowboy_websocket, req, state, %{idle_timeout: 600000}}
             _ -> {:stop, state}
           end
         end

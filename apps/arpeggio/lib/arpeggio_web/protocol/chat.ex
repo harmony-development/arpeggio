@@ -3,16 +3,28 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 defmodule ArpeggioWeb.Chat do
-  def stream_events_init(_req, state) do
+  alias Arpeggio.DB
+
+  def stream_events_init(req, state) do
+    user = DB.get_user_from req
+
+    {:ok, state |> Map.put(:user, user)}
+  end
+
+  def stream_events_handle(req, %{user: user} = state) do
+    case req.request do
+      {:subscribe_to_guild, it} ->
+        Phoenix.PubSub.subscribe :arpeggio, "guild-events:#{it.guild_id}"
+      {:subscribe_to_actions, _it} ->
+        Phoenix.PubSub.subscribe :arpeggio, "action-events:#{user.id}"
+      {:subscribe_to_homeserver_events, _it} ->
+        Phoenix.PubSub.subscribe :arpeggio, "homeserver-events:#{user.id}"
+    end
     {:ok, state}
   end
 
-  def stream_events_handle(_req, state) do
-    {:ok, state}
-  end
-
-  def stream_events_info(_req, state) do
-    {:ok, state}
+  def stream_events_info(info, state) do
+    {:reply, info, state}
   end
 
   def get_user(_conn, req) do
@@ -52,5 +64,21 @@ defmodule ArpeggioWeb.Chat do
     end
 
     {:ok, %Protocol.Chat.V1.CreateGuildResponse{ guild_id: g.id }}
+  end
+
+  def get_guild_list(conn, _req) do
+    user = DB.get_user_from conn
+
+    entries = DB.GuildListEntries.entries user.id
+
+    guilds = entries
+    |> Enum.map(fn x ->
+      %Protocol.Chat.V1.GetGuildListResponse.GuildListEntry{
+        host: x.host,
+        guild_id: x.guild_id,
+      }
+    end)
+
+    {:ok, %Protocol.Chat.V1.GetGuildListResponse{ guilds: guilds }}
   end
 end

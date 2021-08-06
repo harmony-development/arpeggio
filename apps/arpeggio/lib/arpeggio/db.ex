@@ -47,16 +47,6 @@ defmodule Arpeggio.DB do
     end
   end
 
-  @spec get_user_by_session(bitstring) :: {:error} | {:ok, Arpeggio.User.t, {:local, Arpeggio.LocalUser.t} | {:remote, Arpeggio.RemoteUser.t}}
-  def get_user_by_session(session_id) do
-    case Repo.get_by(Arpeggio.Session, id: session_id) do
-      nil ->
-        {:error}
-      session ->
-        get_user session.user_id
-    end
-  end
-
   @spec new_remote_user(Arpeggio.RemoteUser.t(), Arpeggio.User.t()) :: {:ok, any} | {:error, any}
   def new_remote_user(remote_user, user) do
     try do
@@ -128,9 +118,7 @@ defmodule Arpeggio.DB do
     end
   end
 
-  def get_user_from(%Plug.Conn{} = conn, opts \\ %{load_local_remote: false}) do
-    auth = conn |> Plug.Conn.get_req_header("authorization")
-
+  def get_user_from_session(auth, opts \\ %{load_local_remote: false}) do
     q = case opts[:load_local_remote] do
       false -> from session in Arpeggio.Session, where: session.id == ^auth, preload: [:user]
 
@@ -146,5 +134,17 @@ defmodule Arpeggio.DB do
       nil -> throw "bad session"
       it -> it.user
     end
+  end
+
+  def get_user_from(c, opts \\ %{load_local_remote: false})
+
+  def get_user_from(%Plug.Conn{} = conn, opts) do
+    [auth] = conn |> Plug.Conn.get_req_header("authorization")
+
+    get_user_from_session(auth, opts)
+  end
+
+  def get_user_from(%{headers: %{"authorization" => auth}}, opts) do
+    get_user_from_session(auth, opts)
   end
 end
