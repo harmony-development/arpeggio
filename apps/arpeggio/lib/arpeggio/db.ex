@@ -102,6 +102,13 @@ defmodule Arpeggio.DB do
     end
   end
 
+  def join_guild(guild_id, user_id) do
+    %Arpeggio.Member {
+      guild_id: guild_id,
+      user_id: user_id,
+    } |> Repo.insert
+  end
+
   def check_session(conn) do
     session = Repo.get(Arpeggio.Session, conn |> Plug.Conn.get_req_header("authorization") |> Enum.at(0))
     case session do
@@ -134,6 +141,18 @@ defmodule Arpeggio.DB do
       nil -> throw "bad session"
       it -> it.user
     end
+  end
+
+  def guild_members(guild_id, opts \\ %{load_users: false}) do
+    q = case opts[:load_users] do
+      true -> from member in Arpeggio.Member,
+                where: member.guild_id == ^guild_id,
+                preload: [:user]
+      false -> from member in Arpeggio.Member,
+                where: member.guild_id == ^guild_id
+    end
+
+    Repo.all q
   end
 
   def get_user_from(c, opts \\ %{load_local_remote: false})

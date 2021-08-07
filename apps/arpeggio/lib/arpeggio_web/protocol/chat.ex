@@ -60,6 +60,11 @@ defmodule ArpeggioWeb.Chat do
       {:error, err} -> throw {"failed to make guild", err}
     end
 
+    case Arpeggio.DB.join_guild(g.id, user.id) do
+      {:error, err} -> throw {"failed to join guild", err}
+      _ -> nil
+    end
+
     if user.remote_user != nil do
       # TODO(SYNC): broadcast using sync service
     else
@@ -76,6 +81,27 @@ defmodule ArpeggioWeb.Chat do
     end
 
     {:ok, %Protocol.Chat.V1.CreateGuildResponse{ guild_id: g.id }}
+  end
+
+  def get_guild_channels(_conn, req) do
+    chans = Arpeggio.DB.Channel.for_guild req.guild_id
+
+    {:ok, %Protocol.Chat.V1.GetGuildChannelsResponse{
+      channels: chans |> Enum.map(fn it ->
+        %Protocol.Chat.V1.GetGuildChannelsResponse.Channel{
+          channel_id: it.id,
+          channel_name: it.name,
+        }
+      end)
+    }}
+  end
+
+  def get_guild_members(_conn, req) do
+    mems = Arpeggio.DB.guild_members req.guild_id
+
+    {:ok, %Protocol.Chat.V1.GetGuildMembersResponse{
+      members: mems |> Enum.map(fn it -> it.user_id end)
+    }}
   end
 
   def get_guild_list(conn, _req) do
