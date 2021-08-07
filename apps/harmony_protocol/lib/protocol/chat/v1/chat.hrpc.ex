@@ -30,6 +30,7 @@ defmodule Protocol.Chat.V1.ChatServiceService do
 			{"DeleteEmoteFromPack", "/protocol.chat.v1.ChatService/DeleteEmoteFromPack", false, false, Protocol.Chat.V1.DeleteEmoteFromPackRequest, Google.Protobuf.Empty},
 			{"DeleteEmotePack", "/protocol.chat.v1.ChatService/DeleteEmotePack", false, false, Protocol.Chat.V1.DeleteEmotePackRequest, Google.Protobuf.Empty},
 			{"DequipEmotePack", "/protocol.chat.v1.ChatService/DequipEmotePack", false, false, Protocol.Chat.V1.DequipEmotePackRequest, Google.Protobuf.Empty},
+			{"EquipEmotePack", "/protocol.chat.v1.ChatService/EquipEmotePack", false, false, Protocol.Chat.V1.EquipEmotePackRequest, Google.Protobuf.Empty},
 			{"JoinGuild", "/protocol.chat.v1.ChatService/JoinGuild", false, false, Protocol.Chat.V1.JoinGuildRequest, Protocol.Chat.V1.JoinGuildResponse},
 			{"LeaveGuild", "/protocol.chat.v1.ChatService/LeaveGuild", false, false, Protocol.Chat.V1.LeaveGuildRequest, Google.Protobuf.Empty},
 			{"TriggerAction", "/protocol.chat.v1.ChatService/TriggerAction", false, false, Protocol.Chat.V1.TriggerActionRequest, Google.Protobuf.Empty},

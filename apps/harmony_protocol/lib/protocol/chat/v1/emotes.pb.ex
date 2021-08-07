@@ -164,3 +164,16 @@ defmodule Protocol.Chat.V1.DequipEmotePackRequest do
 
   field :pack_id, 1, type: :uint64
 end
+
+defmodule Protocol.Chat.V1.EquipEmotePackRequest do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          pack_id: non_neg_integer
+        }
+
+  defstruct [:pack_id]
+
+  field :pack_id, 1, type: :uint64
+end

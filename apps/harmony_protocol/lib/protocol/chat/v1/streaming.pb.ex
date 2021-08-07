@@ -335,6 +335,25 @@ defmodule Protocol.Chat.V1.Event.RoleMoved do
 
   @type t :: %__MODULE__{
           guild_id: non_neg_integer,
+          role_id: non_neg_integer,
+          previous_id: non_neg_integer,
+          next_id: non_neg_integer
+        }
+
+  defstruct [:guild_id, :role_id, :previous_id, :next_id]
+
+  field :guild_id, 1, type: :uint64
+  field :role_id, 2, type: :uint64
+  field :previous_id, 3, type: :uint64
+  field :next_id, 4, type: :uint64
+end
+
+defmodule Protocol.Chat.V1.Event.RoleDeleted do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          guild_id: non_neg_integer,
           role_id: non_neg_integer
         }
 
@@ -342,6 +361,76 @@ defmodule Protocol.Chat.V1.Event.RoleMoved do
 
   field :guild_id, 1, type: :uint64
   field :role_id, 2, type: :uint64
+end
+
+defmodule Protocol.Chat.V1.Event.RoleCreated do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          guild_id: non_neg_integer,
+          role_id: non_neg_integer,
+          role: Protocol.Chat.V1.Role.t() | nil
+        }
+
+  defstruct [:guild_id, :role_id, :role]
+
+  field :guild_id, 1, type: :uint64
+  field :role_id, 2, type: :uint64
+  field :role, 3, type: Protocol.Chat.V1.Role
+end
+
+defmodule Protocol.Chat.V1.Event.RoleUpdated do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          guild_id: non_neg_integer,
+          role_id: non_neg_integer,
+          role: Protocol.Chat.V1.Role.t() | nil
+        }
+
+  defstruct [:guild_id, :role_id, :role]
+
+  field :guild_id, 1, type: :uint64
+  field :role_id, 3, type: :uint64
+  field :role, 4, type: Protocol.Chat.V1.Role
+end
+
+defmodule Protocol.Chat.V1.Event.RolePermissionsUpdated do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          guild_id: non_neg_integer,
+          channel_id: non_neg_integer,
+          role_id: non_neg_integer,
+          perms: Protocol.Chat.V1.PermissionList.t() | nil
+        }
+
+  defstruct [:guild_id, :channel_id, :role_id, :perms]
+
+  field :guild_id, 1, type: :uint64
+  field :channel_id, 2, type: :uint64
+  field :role_id, 3, type: :uint64
+  field :perms, 4, type: Protocol.Chat.V1.PermissionList
+end
+
+defmodule Protocol.Chat.V1.Event.UserRolesUpdated do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          guild_id: non_neg_integer,
+          user_id: non_neg_integer,
+          role_ids: [non_neg_integer]
+        }
+
+  defstruct [:guild_id, :user_id, :role_ids]
+
+  field :guild_id, 1, type: :uint64
+  field :user_id, 2, type: :uint64
+  field :role_ids, 3, repeated: true, type: :uint64
 end
 
 defmodule Protocol.Chat.V1.Event.ProfileUpdated do
@@ -400,6 +489,25 @@ defmodule Protocol.Chat.V1.Event.Typing do
   field :channel_id, 3, type: :uint64
 end
 
+defmodule Protocol.Chat.V1.Event.PermissionUpdated do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          guild_id: non_neg_integer,
+          channel_id: non_neg_integer,
+          query: String.t(),
+          ok: boolean
+        }
+
+  defstruct [:guild_id, :channel_id, :query, :ok]
+
+  field :guild_id, 1, type: :uint64
+  field :channel_id, 2, type: :uint64
+  field :query, 3, type: :string
+  field :ok, 4, type: :bool
+end
+
 defmodule Protocol.Chat.V1.Event do
   @moduledoc false
   use Protobuf, syntax: :proto3
@@ -424,7 +532,13 @@ defmodule Protocol.Chat.V1.Event do
   field :deleted_guild, 11, type: Protocol.Chat.V1.Event.GuildDeleted, oneof: 0
   field :joined_member, 12, type: Protocol.Chat.V1.Event.MemberJoined, oneof: 0
   field :left_member, 13, type: Protocol.Chat.V1.Event.MemberLeft, oneof: 0
-  field :role_moved, 14, type: Protocol.Chat.V1.Event.RoleMoved, oneof: 0
-  field :profile_updated, 15, type: Protocol.Chat.V1.Event.ProfileUpdated, oneof: 0
-  field :typing, 16, type: Protocol.Chat.V1.Event.Typing, oneof: 0
+  field :profile_updated, 14, type: Protocol.Chat.V1.Event.ProfileUpdated, oneof: 0
+  field :typing, 15, type: Protocol.Chat.V1.Event.Typing, oneof: 0
+  field :role_created, 16, type: Protocol.Chat.V1.Event.RoleCreated, oneof: 0
+  field :role_deleted, 17, type: Protocol.Chat.V1.Event.RoleDeleted, oneof: 0
+  field :role_moved, 18, type: Protocol.Chat.V1.Event.RoleMoved, oneof: 0
+  field :role_updated, 19, type: Protocol.Chat.V1.Event.RoleUpdated, oneof: 0
+  field :role_perms_updated, 20, type: Protocol.Chat.V1.Event.RolePermissionsUpdated, oneof: 0
+  field :user_roles_updated, 21, type: Protocol.Chat.V1.Event.UserRolesUpdated, oneof: 0
+  field :permission_updated, 22, type: Protocol.Chat.V1.Event.PermissionUpdated, oneof: 0
 end
