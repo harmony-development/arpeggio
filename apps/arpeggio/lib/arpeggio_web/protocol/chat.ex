@@ -38,6 +38,13 @@ defmodule ArpeggioWeb.Chat do
     }}
   end
 
+  defp new_id() do
+    case Snowflake.next_id() do
+      {:ok, val} -> val
+      {:error, err} -> raise err
+    end
+  end
+
   # TODO: handle federated vs local users
   def create_guild(conn, req) do
     user = Arpeggio.DB.get_user_from conn, load_local_remote: true
@@ -45,16 +52,21 @@ defmodule ArpeggioWeb.Chat do
     g = case Arpeggio.DB.new_guild %Arpeggio.Guild {
       name: req.guild_name,
       avatar: req.picture_url,
-      metadata: req.metadata
+      metadata: req.metadata,
+      owner_id: user.id,
+      id: new_id(),
     } do
       {:ok, g} -> g
-      {:error, _} -> throw "failed to make guild"
+      {:error, err} -> throw {"failed to make guild", err}
     end
 
     if user.remote_user != nil do
       # TODO(SYNC): broadcast using sync service
     else
-      Arpeggio.DB.GuildListEntries.new user.id, g.id, ""
+      case Arpeggio.DB.GuildListEntries.new user.id, g.id, "" do
+        {:ok, g} -> g
+        {:error, err} -> throw {"failed to insert list entry", err}
+      end
       Phoenix.PubSub.broadcast :arpeggio, "homeserver-events:#{user.id}", %Protocol.Chat.V1.Event {
         event: {:guild_added_to_list, %Protocol.Chat.V1.Event.GuildAddedToList{
           guild_id: g.id,
@@ -91,5 +103,17 @@ defmodule ArpeggioWeb.Chat do
     |> Arpeggio.Repo.update!
 
     {:ok, %Google.Protobuf.Empty{}}
+  end
+
+  def get_guild(_conn, req) do
+    case DB.get_guild_by_id(req.guild_id) do
+      {:ok, g} -> {:ok, %Protocol.Chat.V1.GetGuildResponse{
+        metadata: g.metadata,
+        guild_name: g.name,
+        guild_owner: g.owner_id,
+        guild_picture: g.avatar,
+      }}
+      {:error} -> {:error, "failed to get guild"}
+    end
   end
 end

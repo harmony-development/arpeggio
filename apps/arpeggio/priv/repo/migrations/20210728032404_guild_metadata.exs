@@ -7,7 +7,7 @@ defmodule Arpeggio.Repo.Migrations.GuildMetadata do
 
   def change do
     alter table("guilds") do
-      add :metadata, :binary
+      add :metadata, :binary, null: true
       add :owner_id, references(:users, on_delete: :delete_all), null: false
     end
   end
