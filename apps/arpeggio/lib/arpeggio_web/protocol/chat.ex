@@ -81,4 +81,15 @@ defmodule ArpeggioWeb.Chat do
 
     {:ok, %Protocol.Chat.V1.GetGuildListResponse{ guilds: guilds }}
   end
+
+  def profile_update(conn, req) do
+    DB.get_user_from(conn)
+    |> DB.change_if(%{user_name: req.new_username}, req.update_username)
+    |> DB.change_if(%{user_avatar: req.new_avatar}, req.update_avatar)
+    |> DB.change_if(%{user_status: req.new_status}, req.update_status)
+    |> DB.change_if(%{is_bot: req.is_bot}, req.update_is_bot)
+    |> Arpeggio.Repo.update!
+
+    {:ok, %Google.Protobuf.Empty{}}
+  end
 end

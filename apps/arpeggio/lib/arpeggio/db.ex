@@ -147,4 +147,11 @@ defmodule Arpeggio.DB do
   def get_user_from(%{headers: %{"authorization" => auth}}, opts) do
     get_user_from_session(auth, opts)
   end
+
+  def change_if(strct, changes, condi) do
+    case condi do
+      true -> Ecto.Changeset.change(strct, changes)
+      false -> strct
+    end
+  end
 end
