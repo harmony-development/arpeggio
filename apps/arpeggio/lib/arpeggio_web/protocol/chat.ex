@@ -142,4 +142,8 @@ defmodule ArpeggioWeb.Chat do
       {:error} -> {:error, "failed to get guild"}
     end
   end
+
+  def get_emote_packs(_conn, _req) do
+    {:ok, %Protocol.Chat.V1.GetEmotePacksResponse{}}
+  end
 end

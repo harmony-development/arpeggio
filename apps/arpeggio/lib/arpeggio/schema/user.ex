@@ -10,7 +10,7 @@ defmodule Arpeggio.User do
     has_one :local_user, Arpeggio.LocalUser
     has_one :remote_user, Arpeggio.RemoteUser
 
-    has_many :guilds, Arpeggio.Guild
+    has_many :guilds, Arpeggio.Guild, foreign_key: :owner_id
 
     has_many :guild_list_entries, Arpeggio.GuildListEntry
 
